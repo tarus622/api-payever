@@ -17,6 +17,7 @@ export class UsersService {
     const { name, email, password } = createUserDto;
 
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Save the user to the database

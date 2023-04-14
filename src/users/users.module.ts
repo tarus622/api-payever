@@ -6,6 +6,12 @@ import { UsersController } from './users.controller';
 import { UserSchema } from './schemas/user.schema';
 import { ClientsModule, Transport } from '@nestjs/microservices'
 import { RabbitService } from 'src/rabbitmq/rabbitmq.service';
+import { MailerModule } from '@nestjs-modules/mailer';
+import * as dotenv from  'dotenv' ;
+const options = {
+  path: 'config.env'
+}
+dotenv.config(options);
 
 @Module({
   imports: [
@@ -25,7 +31,21 @@ import { RabbitService } from 'src/rabbitmq/rabbitmq.service';
           },
         },
       },
-    ])
+    ]),
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.MAIL_HOST,
+        port: process.env.MAIL_PORT,
+        secure: false,
+        auth: {
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASSWORD,
+        },
+      },
+      defaults: {
+        from: process.env.MAIL_FROM,
+      },
+    })
   ],
   controllers: [UsersController],
   providers: [UsersService, RabbitService],
