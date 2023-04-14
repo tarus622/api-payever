@@ -44,6 +44,10 @@ export class UsersService {
   async findOne(id: ObjectId) {
     const user = await this.userModel.findById(id).exec();
     
+    if (!user) {
+      return "Error: user not found 😿"
+    }
+    
     return user;
   }
 
