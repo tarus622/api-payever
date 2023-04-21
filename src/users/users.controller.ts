@@ -3,16 +3,16 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ObjectId } from 'mongoose';
 import { ClientProxy } from '@nestjs/microservices'
-import { RabbitService } from 'src/rabbitmq/rabbitmq.service';
+import * as rabbitmqService from '../rabbitmq/rabbitmq.service';
 import { MailerService } from '@nestjs-modules/mailer';
+import mongoose from 'mongoose';
 
 @Controller('api/users')
 export class UsersController {
   private readonly client: ClientProxy;
 
-  constructor(private readonly usersService: UsersService, private readonly rabbitService: RabbitService, 
+  constructor(private readonly usersService: UsersService, private readonly rabbitService: rabbitmqService.RabbitService, 
     private readonly mailerService: MailerService){}
   
   @Post()
@@ -43,19 +43,22 @@ export class UsersController {
 
   // Find user by id
   @Get(':id')
-  async findOne(@Param('id') id: ObjectId) {
+  async findOne(@Param('id') id: mongoose.Types.ObjectId
+  ) {
     return this.usersService.findOne(id);
   }
 
   // Get avatar base64 
   @Get(':id/avatar')
-  async findUserAvatar(@Param('id') id: ObjectId) {
+  async findUserAvatar(@Param('id') id: mongoose.Types.ObjectId
+  ) {
     return this.usersService.findUserAvatar(id);
   }
 
   // Delete user 
   @Delete(':id')
-  async remove(@Param('id') id: ObjectId) {
+  async remove(@Param('id') id: mongoose.Types.ObjectId
+  ) {
     return this.usersService.remove(id);
   }
 }

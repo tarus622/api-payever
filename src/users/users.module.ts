@@ -5,7 +5,7 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { UserSchema } from './schemas/user.schema';
 import { ClientsModule, Transport } from '@nestjs/microservices'
-import { RabbitService } from 'src/rabbitmq/rabbitmq.service';
+import { RabbitService } from '../rabbitmq/rabbitmq.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import * as dotenv from  'dotenv' ;
 const options = {
