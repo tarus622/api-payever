@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService }  from './users.service';
-import { RabbitService } from '../rabbitmq/rabbitmq.service';
-import { MailerService } from '@nestjs-modules/mailer';
 import { UserSchema, UserDocument } from './schemas/user.schema';
 import mongoose, { Types } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -55,21 +53,10 @@ describe('UsersController', () => {
         useValue: {
           create: jest.fn().mockResolvedValue(userToCreate),
           findOne: jest.fn().mockResolvedValue(userToGet),
-          findUserAvatar: jest.fn(),
-          remove: jest.fn()
+          findUserAvatar: jest.fn().mockResolvedValue(userToGet.imageFile),
+          remove: jest.fn().mockResolvedValue(userToGet)
         }
-      }, {
-        provide: RabbitService,
-        useValue: {
-          publishEvent: jest.fn()
-        }
-      },
-    {
-      provide: MailerService,
-      useValue: {
-        sendMail: jest.fn()
-      }
-    }],
+      }],
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
@@ -87,7 +74,6 @@ describe('UsersController', () => {
       // Act
       const createUserDto = new CreateUserDto();
       const result = await controller.create(createUserDto, file);
-      console.log(result);
 
       // Assert
       expect(result).toEqual(userToCreate);
@@ -101,7 +87,35 @@ describe('UsersController', () => {
       const userId = userToGet._id; // ObjectId of the user
 
       // Act
-      const result = await controller.findOne(userId._id);
+      const result = await controller.findOne(userId);
+
+      // Assert
+      expect(result).toEqual(userToGet);
+    })
+  })
+
+  // findUserAvatar() test
+  describe('findUserAvatar', () => {
+    it('Should find a user avatar successfully', async () => {
+      // Arrange
+      const userId = userToGet._id; // ObjectId of the user
+
+      // Act
+      const result = await controller.findUserAvatar(userId);
+
+      // Assert
+      expect(result).toEqual(userToGet.imageFile);
+    }
+  )})
+ 
+  // remove() test
+  describe('remove', () => {
+    it('Should find a user and delete it', async () => {
+      // Arrange
+      const userId = userToGet._id; // ObjectId of the user
+
+      // Act
+      const result = await controller.remove(userId);
 
       // Assert
       expect(result).toEqual(userToGet);

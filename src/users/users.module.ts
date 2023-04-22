@@ -39,11 +39,12 @@ dotenv.config(options);
         secure: false,
         auth: {
           user: process.env.MAIL_USER,
-          pass: process.env.MAIL_PASSWORD,
+          pass: process.env.MAIL_PASSWORD
+          ,
         },
       },
       defaults: {
-        from: process.env.MAIL_FROM,
+        from: '"Payever API" <no-reply@localhost>',
       },
     })
   ],
