@@ -46,7 +46,8 @@ const userToGet = new UserModelGet({
 describe('UsersService', () => {
   let service: UsersService;
   let rabbitService: RabbitService;
-  let client: ClientProxy;
+  let clientRabbit: ClientProxy;
+  let clientMailer: ClientProxy;
   let mailerService: MailerService;
 
   beforeEach(async () => {
@@ -78,12 +79,17 @@ describe('UsersService', () => {
 
     service = module.get<UsersService>(UsersService);
     rabbitService = module.get<RabbitService>(RabbitService);
-    client = module.get<ClientProxy>('RABBITMQ_SERVICE');
+    clientRabbit = module.get<ClientProxy>('RABBITMQ_SERVICE');
+    clientMailer = module.get<ClientProxy>(MailerService);
     mailerService = module.get<MailerService>(MailerService);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+    expect(rabbitService).toBeDefined();
+    expect(clientRabbit).toBeDefined();
+    expect(clientMailer).toBeDefined();
+    expect(mailerService).toBeDefined();
   });
 
   afterEach(() => {
@@ -147,8 +153,8 @@ describe('UsersService', () => {
 
   // RabbitMQ publishEvent() test
   describe('publishEvent', () => {
-    it('should call client.emit with correct arguments', async () => {
-      const emitSpy = jest.spyOn(client, 'emit');
+    it('should call clientRabbit.emit with correct arguments', async () => {
+      const emitSpy = jest.spyOn(clientRabbit, 'emit');
 
       await rabbitService.publishEvent();
 
@@ -157,6 +163,27 @@ describe('UsersService', () => {
       });
     });
   })
-});
 
+  // MailerService sendMail() test
+  describe('sendMail', () => {
+    it('should call clientMail.emit with correct arguments', async () => {
+      // Arrange
+      const sendMailSpy = jest.spyOn(mailerService, 'sendMail');
+      const emailTest = 'emailtest@email.com'
 
+      // Act
+      await mailerService.sendMail({
+        to: emailTest,
+        subject: 'User created!',
+        text: 'Congratulations! You successfully register to us site!',
+      });
+
+      // Assert
+      expect(sendMailSpy).toHaveBeenCalledWith({
+        to: emailTest,
+        subject: 'User created!',
+        text: 'Congratulations! You successfully register to us site!',
+      });
+    })
+  })
+})
