@@ -18,7 +18,7 @@ export class UsersService {
 
   // Create new User
   async create(createUserDto: CreateUserDto, file: Express.Multer.File): Promise<User> {
-
+        
     const fileBuffer = await readFile(file.path)
 
     const createdUser = new this.userModel({
@@ -46,7 +46,6 @@ export class UsersService {
     return createdUser;
 
   }
-
 
   // Find User by "id"
   async findOne(id: mongoose.Types.ObjectId) {

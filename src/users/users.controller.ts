@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, UseInterceptors, Param, Delete, UploadedFile } from '@nestjs/common';
+import * as fs from 'fs/promises';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { UsersService } from './users.service';
@@ -6,11 +7,19 @@ import { CreateUserDto } from './dto/create-user.dto';
 import mongoose from 'mongoose';
 import { User } from './schemas/user.schema';
 
+interface CreateUserRequest {
+  name: string;
+  password: string;
+  email: string;
+  imageName: string;
+  imageFile: Buffer;
+}
+
 @Controller('api/users')
+
 export class UsersController {
 
   constructor(private readonly usersService: UsersService) { }
-
   @Post()
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
@@ -22,13 +31,25 @@ export class UsersController {
       },
     })
   })) // Attach FilesInterceptor middleware to handle file uploads  
-  
-  async create(@Body() createUserDto: CreateUserDto, @UploadedFile() file: Express.Multer.File): Promise<User> {
+
+
+  async create(@Body() body: CreateUserRequest, @UploadedFile() file: Express.Multer.File): Promise<User> {
 
     // Call usersService.create() method with extracted data to create a new user
-    return await this.usersService.create(createUserDto, file);
 
+    try {
+      body.imageName = file.filename;
+      body.imageFile = await fs.readFile(file.path);
+      const createUserDto = new CreateUserDto(body);
+      return await this.usersService.create(createUserDto, file)
+    } catch (error) {
+      console.log(error)
+      // Delete the file
+      fs.unlink(file.path)
+
+    }
   }
+
 
 
   // Find user by id

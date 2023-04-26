@@ -22,25 +22,35 @@ const file: Express.Multer.File = {
   stream: new Readable
 }
 
+// Create "CreateUserRequest" interface
+interface CreateUserRequest {
+  name: string;
+  password: string;
+  email: string;
+  imageName: string;
+  imageFile: Buffer;
+}
+
+
 // Model to create an user
-const UserModelCreate = mongoose.model<UserDocument>('User', UserSchema);
-const userToCreate = new UserModelCreate({
-  name: 'Davi',
+//const UserModelCreate = mongoose.model<UserDocument>('User', UserSchema);
+const userToCreate: CreateUserRequest = {
+  name: 'Davi', 
+  password:'Pantera622',
   email: 'davi@gmail.com',
-  password: 'pantera',
   imageName: file.filename,
-  imageFile: file
-})
+  imageFile: file.buffer
+}
 
 // Model to get an user
 const UserModelGet = mongoose.model<UserDocument>('User', UserSchema);
 const userToGet = new UserModelGet({
   _id: new Types.ObjectId(),
   name: 'Davi',
-  password: 'pantera',
+  password: 'Pantera622',
   email: 'davi@gmail.com',
   imageName: 'turtle',
-  imageFile: ''
+  imageFile: file.buffer
 })
 
 describe('UsersService', () => {
@@ -100,7 +110,7 @@ describe('UsersService', () => {
   describe('create', () => {
     it('Should create an user successfully', async () => {
       // Act
-      const createUserDto = new CreateUserDto();
+      const createUserDto = new CreateUserDto(userToCreate);
       const result = await service.create(createUserDto, file);
 
       // Assert

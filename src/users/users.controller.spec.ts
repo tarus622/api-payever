@@ -1,44 +1,53 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
-import { UsersService }  from './users.service';
+import { UsersService } from './users.service';
 import { UserSchema, UserDocument } from './schemas/user.schema';
 import mongoose, { Types } from 'mongoose';
-import { CreateUserDto } from './dto/create-user.dto';
 import { Readable } from 'stream';
 
 // File to be used in "create()" test
 const file: Express.Multer.File = {
-  fieldname: 'image',
-  originalname: 'test.jpg',
+  fieldname: 'file',
+  originalname: 'tartaruga.jpg',
   encoding: '7bit',
   mimetype: 'image/jpeg',
-  size: 1024,
-  destination: '/uploads',
-  filename: 'test.jpg',
-  path: '/uploads/test.jpg',
-  buffer: Buffer.from('test'),
-  stream: new Readable
+  destination: './uploads',
+  filename: '1681419398706tartaruga.jpg',
+  path: 'uploads\\1681419398706tartaruga.jpg',
+  size: 68906,
+  stream: new Readable,
+  buffer: undefined
 }
 
+// Create "CreateUserRequest" interface
+interface CreateUserRequest {
+  name: string;
+  password: string;
+  email: string;
+  imageName: string;
+  imageFile: Buffer;
+}
+
+
 // Model to create an user
-const UserModelCreate = mongoose.model<UserDocument>('User', UserSchema);
-const userToCreate = new UserModelCreate({
-  name: 'Davi', 
+//const UserModelCreate = mongoose.model<UserDocument>('User', UserSchema);
+const userToCreate: CreateUserRequest = {
+  name: 'Davi',
+  password: 'Pantera622',
   email: 'davi@gmail.com',
-  password:'pantera',
   imageName: file.filename,
-  imageFile: file
-})
+  imageFile: file.buffer
+}
 
 // Model to get an user
 const UserModelGet = mongoose.model<UserDocument>('User', UserSchema);
 const userToGet = new UserModelGet({
   _id: new Types.ObjectId(),
-  name: 'Davi', 
-  password:'pantera',
+  name: 'Davi',
+  password: 'Pantera622',
   email: 'davi@gmail.com',
   imageName: 'turtle',
-  imageFile: ''
+  imageFile: file.buffer
 })
 
 describe('UsersController', () => {
@@ -49,7 +58,7 @@ describe('UsersController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [{
-        provide: UsersService, 
+        provide: UsersService,
         useValue: {
           create: jest.fn().mockResolvedValue(userToCreate),
           findOne: jest.fn().mockResolvedValue(userToGet),
@@ -72,10 +81,7 @@ describe('UsersController', () => {
   describe('create', () => {
     it('Should create an user successfully', async () => {
       // Act
-      const createUserDto = new CreateUserDto();
-      const result = await controller.create(createUserDto, file);
-
-      // Assert
+      const result = await controller.create(userToCreate, file);
       expect(result).toEqual(userToCreate);
     })
   })
@@ -106,8 +112,9 @@ describe('UsersController', () => {
       // Assert
       expect(result).toEqual(userToGet.imageFile);
     }
-  )})
- 
+    )
+  })
+
   // remove() test
   describe('remove', () => {
     it('Should find a user and delete it', async () => {
