@@ -43,10 +43,10 @@ export class UsersController {
       const createUserDto = new CreateUserDto(body);
       return await this.usersService.create(createUserDto, file)
     } catch (error) {
-      console.log(error)
       // Delete the file
       fs.unlink(file.path)
-
+      console.error(error.message)
+      return error.message;
     }
   }
 
@@ -54,22 +54,18 @@ export class UsersController {
 
   // Find user by id
   @Get(':id')
-  async findOne(@Param('id') id: mongoose.Types.ObjectId
-  ) {
-    return this.usersService.findOne(id);
+  async findOne(@Param('id') id: mongoose.Types.ObjectId) {
+    return await this.usersService.findOne(id);
   }
 
   // Get avatar base64 
   @Get(':id/avatar')
-  async findUserAvatar(@Param('id') id: mongoose.Types.ObjectId
-  ) {
+  async findUserAvatar(@Param('id') id: mongoose.Types.ObjectId) {
     return this.usersService.findUserAvatar(id);
   }
 
   // Delete user 
-  @Delete(':id')
-  async remove(@Param('id') id: mongoose.Types.ObjectId
-  ) {
+  @Delete(':id') async remove(@Param('id') id: mongoose.Types.ObjectId) {
     return this.usersService.remove(id);
   }
 }
