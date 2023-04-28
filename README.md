@@ -41,6 +41,7 @@ $ npm install
 To improve segurity to the user of the application, .ENV variables must be used to access the MongoDB database and the email service, like the following steps:
 
 1°: create a config.env file in the root directory
+
 2°: set the following variables:
 ```
 MONGODB_URI={URI of MongoDB to create a connection}
