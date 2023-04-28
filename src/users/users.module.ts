@@ -8,6 +8,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices'
 import { RabbitService } from '../rabbitmq/rabbitmq.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import * as dotenv from  'dotenv' ;
+
+// Load environment variables
 const options = {
   path: 'config.env'
 }
@@ -15,10 +17,13 @@ dotenv.config(options);
 
 @Module({
   imports: [
+    // Set up file upload destination and configuration
     MulterModule.register({
       dest: './uploads',
     }),
+    // Connect to the User schema in the MongoDB database
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    // Set up connection to RabbitMQ microservice
     ClientsModule.register([
       {
         name: 'RABBITMQ_SERVICE',
@@ -32,6 +37,7 @@ dotenv.config(options);
         },
       },
     ]),
+    // Set up email service using Nodemailer and SMTP transport
     MailerModule.forRoot({
       transport: {
         host: process.env.MAIL_HOST,
