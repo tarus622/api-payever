@@ -54,6 +54,24 @@ MAIL_PASSWORD={Password of the email account that will send emails}
 
 ```
 
+## API Endpoints
+
+```POST``` /api/users: create a new user. The body of the request must be contain the following keys: name, password, email and file (should be in multipart/form-data).
+```GET``` /api/users/{userId}: get a user by ID.
+```GET``` /api/users/{userId}/avatar: get a user's avatar base64 encoded.
+```DELETE``` /api/users/{userId}: delete a user.
+
+## Create a new user
+- URL: `POST /api/users`
+- Description: Creates a new user account with the given details.
+- Request Body:
+  | Key | Value |
+  |--------------|--------------------------|
+  | name | Turtle |
+  | password | securePassword622 |
+  | email | turtle@email.com |
+  | file | [Image](https://f.i.uol.com.br/fotografia/2022/10/27/1666892737635ac3c11d0f7_1666892737_3x2_md.jpg)|
+
 ## Running the app
 
 ```bash
@@ -79,17 +97,3 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
