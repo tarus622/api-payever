@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersController } from './users.controller';
-import { UsersService } from './users.service';
-import { UserSchema, UserDocument } from './schemas/user.schema';
+import { UsersController } from '../users.controller';
+import { UsersService } from '../users.service';
+import { UserSchema, UserDocument } from '../schemas/user.schema';
 import mongoose, { Types } from 'mongoose';
 import { Readable } from 'stream';
 

@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from './users.service';
-import { UserDocument, UserSchema } from './schemas/user.schema';
-import { RabbitService } from '../rabbitmq/rabbitmq.service';
+import { UsersService } from '../users.service';
+import { UserDocument, UserSchema } from '../schemas/user.schema';
+import { RabbitService } from '../../rabbitmq/rabbitmq.service';
 import { MailerService } from '@nestjs-modules/mailer';
 import { Readable } from 'stream';
 import mongoose, { Types } from 'mongoose';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from '../dto/create-user.dto';
 import { ClientProxy } from '@nestjs/microservices';
 
 // File to be used in "create()" test

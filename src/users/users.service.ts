@@ -9,6 +9,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserResponseDto } from './dto/response-user.dto';
 import { User } from './schemas/user.schema';
 import * as bcrypt from 'bcrypt';
+import { existsSync } from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -31,15 +32,15 @@ export class UsersService {
       imageFile: fileBuffer
     });
 
-    await this.rabbitService.publishEvent();
-
+    
     return await createdUser.save()
-      .then(async (result) => {
-        await this.mailerService.sendMail({
-          to: createdUser.email,
-          subject: 'User created!',
-          text: 'Congratulations! You successfully register to us site!'
-        })
+    .then(async (result) => {
+      await this.mailerService.sendMail({
+        to: createdUser.email,
+        subject: 'User created!',
+        text: 'Congratulations! You successfully register to us site!'
+      })
+      await this.rabbitService.publishEvent();
         return result;
       })
       .catch((error) => {
@@ -80,7 +81,10 @@ export class UsersService {
     if (!user) {
       return "Error: User not found 😿";
     }
-    unlink(__dirname + `/../../uploads/${user.imageName}`)
+    if (existsSync(__dirname + `/../../uploads/${user.imageName}`)) {
+      unlink(__dirname + `/../../uploads/${user.imageName}`)
+    }
+
     return `This User has been removed of the database:\n\n${user}`;
   }
 }
