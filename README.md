@@ -71,20 +71,43 @@ MAIL_PASSWORD={Password of the email account that will send emails}
   | password | securePassword622 |
   | email | turtle@email.com |
   | file | [Image](https://f.i.uol.com.br/fotografia/2022/10/27/1666892737635ac3c11d0f7_1666892737_3x2_md.jpg)|
+- Response Body:
+{
+    "name": "Turtle",
+    "password": "$2b$10$zfydohNhMvtnF92R0miynOUu3BfGQ9s6bvZnH2jhIYRN5pVC0lRbu",
+    "email": "turtle@email.com",
+    "imageName": "1682685914553tartaruga.jpg"
+}
+- An email and a RabbitMQ event must be sent to the user.
   
 ## Get an user by Id
 - URL: `GET /api/users/{Id}`
 - Description: Get the user by Id.
+- Response Body:
+{
+    "name": "Turtle",
+    "email": "turtle@email.com"
+}
 
 ## Get user avatar image by user Id
 
 - URL: `GET /api/users/{Id}/avatar`
 - Description: Get the user avatar with Id of the user.
+- Response Body: encoded base64 image
 
 ### Delete a user avatar
 
 - URL: `DELETE /api/users/{Id}/avatar`
 - Description: Delete the user avatar with the Id of the user.
+This Avatar has been removed of the database:
+
+{
+  _id: new ObjectId("644bbfda9312c311f9a33f16"),
+  userId: '644bbfda9312c311f9a33f14',
+  imageName: '1682685914553tartaruga.jpg',
+  base64: 
+  Binary.createFromBase64(encoded base64 image, 0)
+}
 
 ## Running the app
 
