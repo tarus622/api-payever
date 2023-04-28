@@ -4,8 +4,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { CreateImageDto } from './dto/create-image.dto';
 import mongoose from 'mongoose';
-import { User } from './schemas/user.schema';
+import { UserResponsePostDto } from './dto/response-user-post.dto';
 
 // Interface to define the shape of the request body for creating a user
 interface CreateUserRequest {
@@ -36,17 +37,21 @@ export class UsersController {
   })) // Attach FilesInterceptor middleware to handle file uploads  
 
 
-  async create(@Body() body: CreateUserRequest, @UploadedFile() file: Express.Multer.File): Promise<User> {
+  async create(@Body() body: CreateUserRequest, @UploadedFile() file: Express.Multer.File): Promise<UserResponsePostDto> {
 
     // Call usersService.create() method with extracted data to create a new user
 
     try {
       // Set the image name and read the file from disk
-      body.imageName = file.filename;
-      body.imageFile = await fs.readFile(file.path);
       // Validate and create a new user using the CreateUserDto class
       const createUserDto = new CreateUserDto(body);
-      return await this.usersService.create(createUserDto, file)
+      body.imageName = file.filename;
+      body.imageFile = await fs.readFile(file.path);
+      const createImageDto = new CreateImageDto({
+        imageName: body.imageName,
+        imageFile: body.imageFile
+      });
+      return await this.usersService.create(createUserDto, createImageDto, file)
     } catch (error) {
       // If there was an error creating the user, delete the uploaded file and log the error
       fs.unlink(file.path)
@@ -70,7 +75,7 @@ export class UsersController {
   }
 
   // Route handler to delete a user by id
-  @Delete(':id') async remove(@Param('id') id: mongoose.Types.ObjectId) {
+  @Delete(':id/avatar') async remove(@Param('id') id: mongoose.Types.ObjectId) {
     return this.usersService.remove(id);
   }
 }

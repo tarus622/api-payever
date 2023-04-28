@@ -4,6 +4,7 @@ import { MulterModule } from '@nestjs/platform-express/multer';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { UserSchema } from './schemas/user.schema';
+import { ImageSchema } from './schemas/image.schema';
 import { ClientsModule, Transport } from '@nestjs/microservices'
 import { RabbitService } from '../rabbitmq/rabbitmq.service';
 import { MailerModule } from '@nestjs-modules/mailer';
@@ -22,7 +23,7 @@ dotenv.config(options);
       dest: './uploads',
     }),
     // Connect to the User schema in the MongoDB database
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }, { name: 'Image', schema: ImageSchema }]),
     // Set up connection to RabbitMQ microservice
     ClientsModule.register([
       {
