@@ -71,6 +71,20 @@ MAIL_PASSWORD={Password of the email account that will send emails}
   | password | securePassword622 |
   | email | turtle@email.com |
   | file | [Image](https://f.i.uol.com.br/fotografia/2022/10/27/1666892737635ac3c11d0f7_1666892737_3x2_md.jpg)|
+  
+## Get an user by Id
+- URL: `GET /api/users/{Id}`
+- Description: Get the user by Id.
+
+## Get user avatar image by user Id
+
+- URL: `GET /api/users/{Id}/avatar`
+- Description: Get the user avatar with Id of the user.
+
+### Delete a user avatar
+
+- URL: `DELETE /api/users/{Id}/avatar`
+- Description: Delete the user avatar with the Id of the user.
 
 ## Running the app
 
