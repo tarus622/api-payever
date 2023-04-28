@@ -2,21 +2,22 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from '../users.controller';
 import { UsersService } from '../users.service';
 import { UserSchema, UserDocument } from '../schemas/user.schema';
+import { ImageSchema, ImageDocument } from '../schemas/image.schema';
 import mongoose, { Types } from 'mongoose';
 import { Readable } from 'stream';
 
 // File to be used in "create()" test
 const file: Express.Multer.File = {
-  fieldname: 'file',
-  originalname: 'tartaruga.jpg',
+  fieldname: 'image',
+  originalname: 'test.jpg',
   encoding: '7bit',
   mimetype: 'image/jpeg',
-  destination: './uploads',
-  filename: '1681419398706tartaruga.jpg',
-  path: 'uploads\\1681419398706tartaruga.jpg',
-  size: 68906,
-  stream: new Readable,
-  buffer: undefined
+  size: 1024,
+  destination: __dirname + '/uploads',
+  filename: 'test.jpg',
+  path: __dirname + '/../../../uploads/test.jpg',
+  buffer: Buffer.from('test'),
+  stream: new Readable
 }
 
 // Create "CreateUserRequest" interface
@@ -24,19 +25,14 @@ interface CreateUserRequest {
   name: string;
   password: string;
   email: string;
-  imageName: string;
-  imageFile: Buffer;
 }
-
 
 // Model to create an user
 //const UserModelCreate = mongoose.model<UserDocument>('User', UserSchema);
 const userToCreate: CreateUserRequest = {
   name: 'Davi',
   password: 'Pantera622',
-  email: 'davi@gmail.com',
-  imageName: file.filename,
-  imageFile: file.buffer
+  email: 'davi@gmail.com'
 }
 
 // Model to get an user
@@ -46,8 +42,16 @@ const userToGet = new UserModelGet({
   name: 'Davi',
   password: 'Pantera622',
   email: 'davi@gmail.com',
-  imageName: 'turtle',
+  imageName: 'Turtle',
   imageFile: file.buffer
+})
+
+// Model to get avatar of an user
+const AvatarModelGet = mongoose.model<ImageDocument>('Image', ImageSchema);
+const avatarToGet = new AvatarModelGet({
+  userId: userToGet._id.toString(),
+  imageName: 'Turtle',
+  base64: file.buffer
 })
 
 describe('UsersController', () => {
@@ -62,8 +66,8 @@ describe('UsersController', () => {
         useValue: {
           create: jest.fn().mockResolvedValue(userToCreate),
           findOne: jest.fn().mockResolvedValue(userToGet),
-          findUserAvatar: jest.fn().mockResolvedValue(userToGet.imageFile),
-          remove: jest.fn().mockResolvedValue(userToGet)
+          findUserAvatar: jest.fn().mockResolvedValue(avatarToGet),
+          remove: jest.fn().mockResolvedValue(avatarToGet)
         }
       }],
     }).compile();
@@ -110,7 +114,7 @@ describe('UsersController', () => {
       const result = await controller.findUserAvatar(userId);
 
       // Assert
-      expect(result).toEqual(userToGet.imageFile);
+      expect(result).toEqual(avatarToGet);
     }
     )
   })
@@ -125,7 +129,7 @@ describe('UsersController', () => {
       const result = await controller.remove(userId);
 
       // Assert
-      expect(result).toEqual(userToGet);
+      expect(result).toEqual(avatarToGet);
     })
   })
 });

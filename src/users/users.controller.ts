@@ -13,8 +13,6 @@ interface CreateUserRequest {
   name: string;
   password: string;
   email: string;
-  imageName: string;
-  imageFile: Buffer;
 }
 
 @Controller('api/users')
@@ -45,16 +43,15 @@ export class UsersController {
       // Set the image name and read the file from disk
       // Validate and create a new user using the CreateUserDto class
       const createUserDto = new CreateUserDto(body);
-      body.imageName = file.filename;
-      body.imageFile = await fs.readFile(file.path);
+      const imageFile = await fs.readFile(__dirname + '/../../uploads/' + file.filename);
       const createImageDto = new CreateImageDto({
-        imageName: body.imageName,
-        imageFile: body.imageFile
+        imageName: file.filename,
+        imageFile: imageFile
       });
       return await this.usersService.create(createUserDto, createImageDto, file)
     } catch (error) {
       // If there was an error creating the user, delete the uploaded file and log the error
-      fs.unlink(file.path)
+      fs.unlink(__dirname + '/../../uploads/' + file.filename)
       console.error(error.message)
       return error.message;
     }

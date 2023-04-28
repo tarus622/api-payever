@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from '../users.service';
 import { UserDocument, UserSchema } from '../schemas/user.schema';
+import { ImageSchema, ImageDocument } from '../schemas/image.schema';
 import { RabbitService } from '../../rabbitmq/rabbitmq.service';
 import { MailerService } from '@nestjs-modules/mailer';
 import { Readable } from 'stream';
 import mongoose, { Types } from 'mongoose';
 import { CreateUserDto } from '../dto/create-user.dto';
+import { CreateImageDto } from '../dto/create-image.dto';
 import { ClientProxy } from '@nestjs/microservices';
 
 // File to be used in "create()" test
@@ -15,9 +17,9 @@ const file: Express.Multer.File = {
   encoding: '7bit',
   mimetype: 'image/jpeg',
   size: 1024,
-  destination: '/uploads',
+  destination: __dirname + '/uploads',
   filename: 'test.jpg',
-  path: '/uploads/test.jpg',
+  path: __dirname + '/../../../uploads/test.jpg',
   buffer: Buffer.from('test'),
   stream: new Readable
 }
@@ -27,19 +29,20 @@ interface CreateUserRequest {
   name: string;
   password: string;
   email: string;
+}
+
+// Create "CreateImageRequest" interface
+interface CreateImageRequest {
   imageName: string;
   imageFile: Buffer;
 }
-
 
 // Model to create an user
 //const UserModelCreate = mongoose.model<UserDocument>('User', UserSchema);
 const userToCreate: CreateUserRequest = {
   name: 'Davi', 
   password:'Pantera622',
-  email: 'davi@gmail.com',
-  imageName: file.filename,
-  imageFile: file.buffer
+  email: 'davi@gmail.com'
 }
 
 // Model to get an user
@@ -51,6 +54,20 @@ const userToGet = new UserModelGet({
   email: 'davi@gmail.com',
   imageName: 'turtle',
   imageFile: file.buffer
+})
+
+// Model to create an user avatar
+const avatarToCreate: CreateImageRequest = {
+  imageName: 'Turtle',
+  imageFile: file.buffer
+}
+
+// Model to get avatar of an user
+const AvatarModelGet = mongoose.model<ImageDocument>('Image', ImageSchema);
+const avatarToGet = new AvatarModelGet({
+  userId: userToGet._id,
+  imageName: 'turtle',
+  base64: file.buffer.toString('base64')
 })
 
 describe('UsersService', () => {
@@ -68,8 +85,8 @@ describe('UsersService', () => {
         useValue: {
           create: jest.fn().mockResolvedValue(userToCreate),
           findOne: jest.fn().mockResolvedValue(userToGet),
-          findUserAvatar: jest.fn().mockResolvedValue(userToGet.imageFile),
-          remove: jest.fn().mockResolvedValue(userToGet)
+          findUserAvatar: jest.fn().mockResolvedValue(avatarToGet.base64),
+          remove: jest.fn().mockResolvedValue(avatarToGet)
         }
       },
         RabbitService,
@@ -111,7 +128,8 @@ describe('UsersService', () => {
     it('Should create an user successfully', async () => {
       // Act
       const createUserDto = new CreateUserDto(userToCreate);
-      const result = await service.create(createUserDto, file);
+      const createImageDto = new CreateImageDto(avatarToCreate);
+      const result = await service.create(createUserDto, createImageDto, file);
 
       // Assert
       expect(result).toEqual(userToCreate);
@@ -142,7 +160,7 @@ describe('UsersService', () => {
       const result = await service.findUserAvatar(userId);
 
       // Assert
-      expect(result).toEqual(userToGet.imageFile);
+      expect(result).toEqual(avatarToGet.base64);
     }
     )
   })
@@ -157,7 +175,7 @@ describe('UsersService', () => {
       const result = await service.remove(userId);
 
       // Assert
-      expect(result).toEqual(userToGet);
+      expect(result).toEqual(avatarToGet);
     })
   })
 
