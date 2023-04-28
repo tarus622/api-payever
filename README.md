@@ -21,16 +21,56 @@
 </p>
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+  
+# NestJS CRUD API using MongoDB database 
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+An API made with NestJS to accomplish CRUD operations to create users accounts and store them in a MongoDB database with hashed password. After the user is register, an email message and a Rabbit event is send to the user. Furthermore, the operations of get and delete users of MongoDB database are available (update operations are not available).
 
 ## Installation
+
+To install all node dependencies of the project, run the following command:
 
 ```bash
 $ npm install
 ```
+
+## Set Environment variables
+
+To improve segurity to the user of the application, .ENV variables must be used to access the MongoDB database and the email service, like the following steps:
+
+1°: create a config.env file in the root directory
+
+2°: set the following variables:
+```
+MONGODB_URI={URI of MongoDB to create a connection}
+MONGODB_PASSWORD={Password of the database}
+# mail
+MAIL_HOST={SMTP server hostname}
+MAIL_PORT={Port number of SMTP server (587 is recommended)}
+MAIL_USER={Username of the Email account that will send e-mails}
+MAIL_PASSWORD={Password of the email account that will send emails}
+
+```
+
+## API Endpoints
+
+```POST``` /api/users: create a new user. The body of the request must be contain the following keys: name, password, email and file (should be in multipart/form-data).
+```GET``` /api/users/{userId}: get a user by ID.
+```GET``` /api/users/{userId}/avatar: get a user's avatar base64 encoded.
+```DELETE``` /api/users/{userId}: delete a user.
+
+## Create a new user
+- URL: `POST /api/users`
+- Description: Creates a new user account with the given details.
+- Request Body:
+  | Key | Value |
+  |--------------|--------------------------|
+  | name | Turtle |
+  | password | securePassword622 |
+  | email | turtle@email.com |
+  | file | [Image](https://f.i.uol.com.br/fotografia/2022/10/27/1666892737635ac3c11d0f7_1666892737_3x2_md.jpg)|
 
 ## Running the app
 
@@ -57,17 +97,3 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
